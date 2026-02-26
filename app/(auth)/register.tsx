@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator, Alert } from 'react-native';
+import {
+    View, Text, TextInput, TouchableOpacity, StyleSheet,
+    ScrollView, ActivityIndicator, Alert, SafeAreaView, Platform, StatusBar,
+} from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -14,6 +17,7 @@ export default function RegisterScreen() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const router = useRouter();
     const { colors } = useTheme();
@@ -37,7 +41,7 @@ export default function RegisterScreen() {
         setIsLoading(true);
         try {
             await signUp(email, password, name, country);
-            // Router will automatically redirect to (tabs) due to AuthContext listener
+            // AuthContext listener will automatically redirect to (tabs)
         } catch (error: any) {
             Alert.alert('Registration Error', error.message || 'An error occurred during registration');
         } finally {
@@ -50,14 +54,18 @@ export default function RegisterScreen() {
             colors={[colors.background, colors.surface]}
             style={styles.container}
         >
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
-            >
-                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <SafeAreaView style={styles.safeArea}>
+                <ScrollView
+                    contentContainerStyle={styles.scrollContent}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                    bounces={false}
+                >
+                    {/* Back Button */}
                     <TouchableOpacity
                         style={styles.backButton}
                         onPress={() => router.back()}
+                        hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
                     >
                         <Ionicons name="arrow-back" size={24} color={colors.text} />
                     </TouchableOpacity>
@@ -77,6 +85,7 @@ export default function RegisterScreen() {
                                 placeholderTextColor={colors.textSecondary}
                                 value={name}
                                 onChangeText={setName}
+                                returnKeyType="next"
                             />
                         </View>
 
@@ -89,6 +98,7 @@ export default function RegisterScreen() {
                                 placeholderTextColor={colors.textSecondary}
                                 value={country}
                                 onChangeText={setCountry}
+                                returnKeyType="next"
                             />
                         </View>
 
@@ -103,6 +113,7 @@ export default function RegisterScreen() {
                                 onChangeText={setEmail}
                                 autoCapitalize="none"
                                 keyboardType="email-address"
+                                returnKeyType="next"
                             />
                         </View>
 
@@ -116,12 +127,14 @@ export default function RegisterScreen() {
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
+                                returnKeyType="next"
                             />
                             <TouchableOpacity
                                 style={styles.eyeIcon}
                                 onPress={() => setShowPassword(!showPassword)}
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                             >
-                                <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textSecondary} />
+                                <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
 
@@ -129,19 +142,29 @@ export default function RegisterScreen() {
                         <View style={styles.inputContainer}>
                             <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
                             <TextInput
-                                style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+                                style={[styles.input, { color: colors.text, borderColor: colors.border, paddingRight: 50 }]}
                                 placeholder="Confirm Password"
                                 placeholderTextColor={colors.textSecondary}
                                 value={confirmPassword}
                                 onChangeText={setConfirmPassword}
-                                secureTextEntry={!showPassword}
+                                secureTextEntry={!showConfirmPassword}
+                                returnKeyType="done"
+                                onSubmitEditing={handleRegister}
                             />
+                            <TouchableOpacity
+                                style={styles.eyeIcon}
+                                onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                            >
+                                <Ionicons name={showConfirmPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.textSecondary} />
+                            </TouchableOpacity>
                         </View>
 
                         <TouchableOpacity
                             style={[styles.registerButton, { backgroundColor: colors.primary }]}
                             onPress={handleRegister}
                             disabled={isLoading}
+                            activeOpacity={0.85}
                         >
                             {isLoading ? (
                                 <ActivityIndicator color={colors.surface} />
@@ -152,13 +175,13 @@ export default function RegisterScreen() {
 
                         <View style={styles.loginContainer}>
                             <Text style={[styles.loginText, { color: colors.textSecondary }]}>Already have an account? </Text>
-                            <TouchableOpacity onPress={() => router.back()}>
+                            <TouchableOpacity onPress={() => router.push('/(auth)/login')}>
                                 <Text style={[styles.loginLink, { color: colors.secondary }]}>Sign In</Text>
                             </TouchableOpacity>
                         </View>
                     </View>
                 </ScrollView>
-            </KeyboardAvoidingView>
+            </SafeAreaView>
         </LinearGradient>
     );
 }
@@ -167,25 +190,25 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    keyboardView: {
+    safeArea: {
         flex: 1,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
     },
     scrollContent: {
         flexGrow: 1,
-        padding: 24,
-        justifyContent: 'center',
+        paddingHorizontal: 24,
+        paddingTop: 24,
+        paddingBottom: 40,
     },
     backButton: {
-        position: 'absolute',
-        top: 50,
-        left: 20,
-        zIndex: 10,
+        alignSelf: 'flex-start',
         padding: 8,
+        marginBottom: 8,
     },
     headerContainer: {
-        marginBottom: 40,
+        marginBottom: 36,
         alignItems: 'center',
-        marginTop: 40,
+        marginTop: 16,
     },
     title: {
         fontSize: 32,
@@ -232,7 +255,7 @@ const styles = StyleSheet.create({
         borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginTop: 16,
+        marginTop: 8,
         marginBottom: 24,
         elevation: 2,
         shadowColor: '#000',

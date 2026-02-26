@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Stack, useRouter, useSegments } from 'expo-router';
+import { Stack, useRouter, useSegments, useNavigationContainerRef } from 'expo-router';
 import { AuthProvider, useAuth } from '../contexts/AuthContext';
 import { ThemeProvider, useTheme } from '../contexts/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
@@ -16,10 +16,10 @@ function InitialLayout() {
         const inAuthGroup = segments[0] === '(auth)';
 
         if (!user && !inAuthGroup) {
-            // Redirect to the sign-in page.
+            // Not logged in — send to splash/login
             router.replace('/(auth)/splash');
         } else if (user && inAuthGroup) {
-            // Redirect to the home page.
+            // Logged in — send to main tabs
             router.replace('/(tabs)' as any);
         }
     }, [user, isLoading, segments]);
@@ -31,6 +31,7 @@ function InitialLayout() {
                 screenOptions={{
                     headerShown: false,
                     contentStyle: { backgroundColor: colors.background },
+                    animation: 'fade',
                 }}
             >
                 <Stack.Screen name="(auth)" options={{ headerShown: false }} />

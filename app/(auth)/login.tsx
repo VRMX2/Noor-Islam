@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator, Alert, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -50,71 +50,86 @@ export default function LoginScreen() {
             colors={[colors.background, colors.surface]}
             style={styles.container}
         >
-            <KeyboardAvoidingView
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                style={styles.keyboardView}
-            >
-                <View style={styles.headerContainer}>
-                    <Text style={[styles.title, { color: colors.primary }]}>Welcome Back</Text>
-                    <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to continue your journey</Text>
-                </View>
-
-                <View style={styles.formContainer}>
-                    <View style={styles.inputContainer}>
-                        <Ionicons name="mail-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                        <TextInput
-                            style={[styles.input, { color: colors.text, borderColor: colors.border }]}
-                            placeholder="Email"
-                            placeholderTextColor={colors.textSecondary}
-                            value={email}
-                            onChangeText={setEmail}
-                            autoCapitalize="none"
-                            keyboardType="email-address"
-                        />
-                    </View>
-
-                    <View style={[styles.inputContainer, styles.passwordContainer]}>
-                        <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
-                        <TextInput
-                            style={[styles.input, { color: colors.text, borderColor: colors.border, paddingRight: 50 }]}
-                            placeholder="Password"
-                            placeholderTextColor={colors.textSecondary}
-                            value={password}
-                            onChangeText={setPassword}
-                            secureTextEntry={!showPassword}
-                        />
-                        <TouchableOpacity
-                            style={styles.eyeIcon}
-                            onPress={() => setShowPassword(!showPassword)}
-                        >
-                            <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textSecondary} />
-                        </TouchableOpacity>
-                    </View>
-
-                    <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
-                        <Text style={[styles.forgotPasswordText, { color: colors.secondary }]}>Forgot Password?</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity
-                        style={[styles.loginButton, { backgroundColor: colors.primary }]}
-                        onPress={handleLogin}
-                        disabled={isLoading}
+            <SafeAreaView style={styles.safeArea}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    style={styles.keyboardView}
+                    keyboardVerticalOffset={Platform.OS === 'android' ? 0 : 0}
+                >
+                    <ScrollView
+                        contentContainerStyle={styles.scrollContent}
+                        keyboardShouldPersistTaps="handled"
+                        showsVerticalScrollIndicator={false}
+                        bounces={false}
                     >
-                        {isLoading ? (
-                            <ActivityIndicator color={colors.surface} />
-                        ) : (
-                            <Text style={[styles.loginButtonText, { color: colors.surface }]}>Sign In</Text>
-                        )}
-                    </TouchableOpacity>
+                        <View style={styles.headerContainer}>
+                            <Text style={[styles.title, { color: colors.primary }]}>Welcome Back</Text>
+                            <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Sign in to continue your journey</Text>
+                        </View>
 
-                    <View style={styles.registerContainer}>
-                        <Text style={[styles.registerText, { color: colors.textSecondary }]}>Don't have an account? </Text>
-                        <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-                            <Text style={[styles.registerLink, { color: colors.secondary }]}>Sign Up</Text>
-                        </TouchableOpacity>
-                    </View>
-                </View>
-            </KeyboardAvoidingView>
+                        <View style={styles.formContainer}>
+                            <View style={styles.inputContainer}>
+                                <Ionicons name="mail-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                                <TextInput
+                                    style={[styles.input, { color: colors.text, borderColor: colors.border }]}
+                                    placeholder="Email"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    autoCapitalize="none"
+                                    keyboardType="email-address"
+                                    returnKeyType="next"
+                                />
+                            </View>
+
+                            <View style={[styles.inputContainer, styles.passwordContainer]}>
+                                <Ionicons name="lock-closed-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                                <TextInput
+                                    style={[styles.input, { color: colors.text, borderColor: colors.border, paddingRight: 50 }]}
+                                    placeholder="Password"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    returnKeyType="done"
+                                    onSubmitEditing={handleLogin}
+                                />
+                                <TouchableOpacity
+                                    style={styles.eyeIcon}
+                                    onPress={() => setShowPassword(!showPassword)}
+                                    hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                                >
+                                    <Ionicons name={showPassword ? "eye-off-outline" : "eye-outline"} size={20} color={colors.textSecondary} />
+                                </TouchableOpacity>
+                            </View>
+
+                            <TouchableOpacity style={styles.forgotPassword} onPress={handleForgotPassword}>
+                                <Text style={[styles.forgotPasswordText, { color: colors.secondary }]}>Forgot Password?</Text>
+                            </TouchableOpacity>
+
+                            <TouchableOpacity
+                                style={[styles.loginButton, { backgroundColor: colors.primary }]}
+                                onPress={handleLogin}
+                                disabled={isLoading}
+                                activeOpacity={0.85}
+                            >
+                                {isLoading ? (
+                                    <ActivityIndicator color={colors.surface} />
+                                ) : (
+                                    <Text style={[styles.loginButtonText, { color: colors.surface }]}>Sign In</Text>
+                                )}
+                            </TouchableOpacity>
+
+                            <View style={styles.registerContainer}>
+                                <Text style={[styles.registerText, { color: colors.textSecondary }]}>Don't have an account? </Text>
+                                <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
+                                    <Text style={[styles.registerLink, { color: colors.secondary }]}>Sign Up</Text>
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+                    </ScrollView>
+                </KeyboardAvoidingView>
+            </SafeAreaView>
         </LinearGradient>
     );
 }
@@ -123,8 +138,15 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
+    safeArea: {
+        flex: 1,
+        paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0,
+    },
     keyboardView: {
         flex: 1,
+    },
+    scrollContent: {
+        flexGrow: 1,
         justifyContent: 'center',
         padding: 24,
     },
