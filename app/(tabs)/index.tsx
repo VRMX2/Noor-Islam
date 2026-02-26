@@ -1,13 +1,14 @@
 import React from 'react';
 import {
     View, Text, ScrollView, StyleSheet, TouchableOpacity,
-    SafeAreaView, StatusBar, Platform,
+    SafeAreaView, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { Typography } from '../../constants/theme';
 
 const FEATURE_CARDS = [
     { title: 'Quran', subtitle: 'Read & Listen', icon: 'book-open-page-variant-outline', route: '/(tabs)/quran', lib: 'mci' },
@@ -34,17 +35,16 @@ export default function HomeScreen() {
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
 
-                {/* Header */}
+                {/* Header Banner */}
                 <LinearGradient
                     colors={[colors.primary, isDark ? '#2D5016' : '#2D6A4F']}
                     style={styles.header}
                     start={{ x: 0, y: 0 }}
                     end={{ x: 1, y: 1 }}
                 >
-                    <View>
+                    <View style={styles.headerText}>
                         <Text style={styles.arabicGreeting}>{greeting()}</Text>
                         <Text style={styles.greeting}>Welcome, {displayName}</Text>
                         <Text style={styles.date}>
@@ -88,14 +88,15 @@ export default function HomeScreen() {
                         </TouchableOpacity>
                     ))}
                 </View>
-
             </ScrollView>
         </SafeAreaView>
     );
 }
 
+const sys = Platform.select({ ios: 'System', android: 'Roboto', default: 'System' });
+
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0 },
+    safeArea: { flex: 1 },
     scrollContent: { paddingBottom: 32 },
     header: {
         marginHorizontal: 16,
@@ -106,6 +107,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
     },
+    headerText: { flex: 1 },
     arabicGreeting: {
         fontSize: 22,
         color: '#D4A853',
@@ -115,13 +117,15 @@ const styles = StyleSheet.create({
     greeting: {
         fontSize: 18,
         color: '#fff',
-        fontFamily: 'Amiri_700Bold',
+        fontFamily: sys,
+        fontWeight: '700',
         marginBottom: 4,
     },
     date: {
         fontSize: 13,
         color: 'rgba(255,255,255,0.75)',
-        fontFamily: 'Amiri_400Regular',
+        fontFamily: sys,
+        fontWeight: '400',
     },
     islamicBadge: {
         width: 56,
@@ -139,10 +143,11 @@ const styles = StyleSheet.create({
         borderWidth: 1,
     },
     verseLabel: {
-        fontSize: 12,
-        fontFamily: 'Amiri_700Bold',
+        fontSize: 11,
+        fontFamily: sys,
+        fontWeight: '700',
         textTransform: 'uppercase',
-        letterSpacing: 1,
+        letterSpacing: 1.2,
         marginBottom: 10,
     },
     verseArabic: {
@@ -154,14 +159,16 @@ const styles = StyleSheet.create({
     },
     verseTranslation: {
         fontSize: 14,
-        fontFamily: 'Amiri_400Regular',
+        fontFamily: sys,
+        fontWeight: '400',
         fontStyle: 'italic',
         lineHeight: 22,
     },
     sectionTitle: {
-        fontSize: 18,
-        fontFamily: 'Amiri_700Bold',
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontFamily: sys,
+        fontWeight: '700',
+        letterSpacing: -0.3,
         marginHorizontal: 16,
         marginBottom: 12,
     },
@@ -189,9 +196,13 @@ const styles = StyleSheet.create({
     },
     cardTitle: {
         fontSize: 15,
-        fontFamily: 'Amiri_700Bold',
+        fontFamily: sys,
         fontWeight: '600',
         marginBottom: 2,
     },
-    cardSubtitle: { fontSize: 12, fontFamily: 'Amiri_400Regular' },
+    cardSubtitle: {
+        fontSize: 12,
+        fontFamily: sys,
+        fontWeight: '400',
+    },
 });

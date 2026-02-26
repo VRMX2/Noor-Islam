@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     View, Text, FlatList, StyleSheet, TouchableOpacity,
-    SafeAreaView, StatusBar, Platform, ActivityIndicator, TextInput,
+    SafeAreaView, ActivityIndicator, TextInput, Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,6 +15,8 @@ interface Surah {
     numberOfAyahs: number;
     revelationType: string;
 }
+
+const sys = Platform.select({ ios: 'System', android: 'Roboto', default: 'System' });
 
 export default function QuranScreen() {
     const { colors, isDark } = useTheme();
@@ -67,11 +69,10 @@ export default function QuranScreen() {
 
     return (
         <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
-            <StatusBar barStyle={isDark ? 'light-content' : 'dark-content'} backgroundColor={colors.background} />
 
             <View style={styles.header}>
-                <Text style={[styles.title, { color: colors.primary }]}>القرآن الكريم</Text>
-                <Text style={[styles.subtitle, { color: colors.textSecondary }]}>The Holy Quran</Text>
+                <Text style={[styles.arabicTitle, { color: colors.primary }]}>القرآن الكريم</Text>
+                <Text style={[styles.title, { color: colors.text }]}>The Holy Quran</Text>
             </View>
 
             <View style={[styles.searchContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -93,7 +94,7 @@ export default function QuranScreen() {
             {loading ? (
                 <View style={styles.center}>
                     <ActivityIndicator size="large" color={colors.primary} />
-                    <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading Surahs...</Text>
+                    <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading Surahs…</Text>
                 </View>
             ) : (
                 <FlatList
@@ -110,10 +111,10 @@ export default function QuranScreen() {
 }
 
 const styles = StyleSheet.create({
-    safeArea: { flex: 1, paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0 },
+    safeArea: { flex: 1 },
     header: { alignItems: 'center', paddingVertical: 16 },
-    title: { fontSize: 28, fontFamily: 'Amiri_700Bold', fontWeight: 'bold' },
-    subtitle: { fontSize: 14, fontFamily: 'Amiri_400Regular', marginTop: 2 },
+    arabicTitle: { fontSize: 28, fontFamily: 'Amiri_700Bold' },
+    title: { fontSize: 14, fontFamily: sys, fontWeight: '400', marginTop: 2, letterSpacing: 0.2 },
     searchContainer: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -125,7 +126,7 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         gap: 8,
     },
-    searchInput: { flex: 1, fontSize: 15, fontFamily: 'Amiri_400Regular' },
+    searchInput: { flex: 1, fontSize: 15, fontFamily: sys },
     list: { paddingHorizontal: 16, paddingBottom: 24 },
     surahRow: {
         flexDirection: 'row',
@@ -142,11 +143,11 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    numberText: { color: '#fff', fontSize: 13, fontWeight: 'bold' },
+    numberText: { color: '#fff', fontSize: 13, fontFamily: sys, fontWeight: '700' },
     surahInfo: { flex: 1 },
-    surahEnglish: { fontSize: 15, fontFamily: 'Amiri_700Bold', fontWeight: '600', marginBottom: 2 },
-    surahMeta: { fontSize: 12, fontFamily: 'Amiri_400Regular' },
+    surahEnglish: { fontSize: 15, fontFamily: sys, fontWeight: '600', marginBottom: 2 },
+    surahMeta: { fontSize: 12, fontFamily: sys, fontWeight: '400' },
     arabicName: { fontSize: 20, fontFamily: 'Amiri_700Bold' },
     center: { flex: 1, justifyContent: 'center', alignItems: 'center', gap: 12 },
-    loadingText: { fontSize: 14, fontFamily: 'Amiri_400Regular' },
+    loadingText: { fontSize: 14, fontFamily: sys },
 });
