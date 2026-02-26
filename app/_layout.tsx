@@ -20,7 +20,7 @@ function InitialLayout() {
             router.replace('/(auth)/splash');
         } else if (user && inAuthGroup) {
             // Redirect to the home page.
-            router.replace('/(tabs)');
+            router.replace('/(tabs)' as any);
         }
     }, [user, isLoading, segments]);
 

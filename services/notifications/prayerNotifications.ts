@@ -6,6 +6,8 @@ Notifications.setNotificationHandler({
         shouldShowAlert: true,
         shouldPlaySound: true,
         shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
     }),
 });
 
@@ -51,7 +53,7 @@ export async function schedulePrayerNotification(
             body: `It is time for ${prayerName} prayer.`,
             sound: soundName || true,
         },
-        trigger,
+        trigger: { date: trigger } as Notifications.DateTriggerInput,
     });
 }
 
